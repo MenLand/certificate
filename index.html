@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+		<title>Document</title>
+	</head>
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+
+		.container {
+			max-width: 700px;
+			margin: 0 auto;
+		}
+
+		img {
+			width: 100%;
+			max-width: 700px;
+		}
+	</style>
+	<body>
+		<div class="container">
+			<button id="button">Посмотреть сертификат</button>
+
+			<form class="form" action="">
+				<p class="form__field">
+					<label class="form__label">Введите имя</label>
+					<input id="input" type="text" class="form__input" />
+				</p>
+				<p class="form__field">
+					<label class="form__label">Выберите услугу</label>
+					<select name="" id="selectService">
+						<option value="a">Все виды услуг</option>
+						<option value="b">Мотоцикл</option>
+						<option value="с">Квадроцикл</option>
+					</select>
+				</p>
+				<p class="form__field">
+					<label class="form__label">Выберите цену</label>
+					<select name="" id="priceService">
+						<option value="a">1000 руб</option>
+						<option value="b">2000 руб</option>
+						<option value="с">5000 руб</option>
+					</select>
+				</p>
+				<p class="form__field">
+					<label class="form__label">Пожелание</label>
+					<input id="wishes" type="text" class="form__input" />
+				</p>
+			</form>
+			<div class="certificate">
+				<img src="" alt="" />
+				<div class="certificate__container">
+					<img id="certificateImage" class="certificate__image" />
+				</div>
+				<canvas style="display: none" id="myCanvas"></canvas>
+			</div>
+		</div>
+	</body>
+
+	<script>
+		function randomInteger(min, max) {
+			// получить случайное число от (min-0.5) до (max+0.5)
+			let rand = min - 0.5 + Math.random() * (max - min + 1);
+			return Math.round(rand);
+		}
+
+		var userName = '';
+		var serviceName = '';
+		var price = '';
+		var wishesText = '';
+
+		var number = randomInteger(10000, 99999);
+
+		let loadImageOnCanvasAndThenWriteText = (canvas, imageUrl) => {
+			// Get the 2D Context from the canvas
+			let ctx = canvas.getContext('2d');
+
+			// Create a new Image
+			let img = new Image();
+
+			// Setting up a function with the code to run after the image is loaded
+			img.onload = () => {
+				// Once the image is loaded, we will get the width & height of the image
+				let loadedImageWidth = img.width;
+				let loadedImageHeight = img.height;
+
+				// Set the canvas to the same size as the image.
+				canvas.width = loadedImageWidth;
+				canvas.height = loadedImageHeight;
+
+				// Draw the image on to the canvas.
+				ctx.drawImage(img, 0, 0);
+
+				// Set all the properties of the text based on the input params
+				ctx.font = 'bold 170px monotype corsiva';
+
+				ctx.fillStyle = 'blue';
+
+				// Setting this so that the postion of the text can be set
+				// based on the x and y cord from the top right corner
+				ctx.textBaseline = 'top';
+			};
+
+			// Now that we have set up the image "onload" handeler, we can assign
+			// an image URL to the image.
+			img.src = imageUrl;
+
+			button.onclick = () => {
+				ctx.drawImage(img, 0, 0);
+				ctx.fillText(serviceName, 1640, 1120); // Service name
+				ctx.fillText(input.value, 1240, 890); // User name
+				ctx.fillText(price, 2240, 1340); // price name
+				ctx.fillText(wishesText, 1560, 1560); // wishes
+				ctx.fillText(number, 40, 130); // random number
+
+				certificateImage.src = canvas.toDataURL('image/jpg');
+			};
+
+			input.addEventListener('input', function (e) {
+				userName = e.target.value;
+			});
+			wishes.addEventListener('input', function (e) {
+				wishesText = e.target.value;
+			});
+
+			selectService.addEventListener('change', function (e) {
+				var value = e.currentTarget.value;
+				var text =
+					e.currentTarget.options[e.currentTarget.selectedIndex].text;
+
+				serviceName = text;
+			});
+
+			priceService.addEventListener('change', function (e) {
+				var value = e.currentTarget.value;
+				var text =
+					e.currentTarget.options[e.currentTarget.selectedIndex].text;
+
+				price = text;
+			});
+
+			price = priceService.options[priceService.selectedIndex].text;
+			serviceName =
+				selectService.options[selectService.selectedIndex].text;
+		};
+
+		// Run code after the page is loaded
+		document.addEventListener('DOMContentLoaded', () => {
+			// Setting up the canvas
+			let theCanvas = document.getElementById('myCanvas');
+
+			// Some image URL..
+			let imageUrl = './образц.jpg';
+
+			// Load image on the canvas & then write text
+			loadImageOnCanvasAndThenWriteText(theCanvas, imageUrl);
+		});
+	</script>
+</html>
