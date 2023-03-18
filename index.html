@@ -5,162 +5,254 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+			crossorigin="anonymous" />
+
 		<title>Document</title>
 	</head>
 
 	<style>
+		@font-face {
+			font-family: 'Ee-bellflower';
+			font-style: normal;
+			font-weight: 400;
+			/* Браузер сначала попробует найти шрифт локально */
+			src: local('Ee-bellflower'),
+				/* Если не получилось, загрузит woff2 */
+					url('./Ee-bellflower.woff2') format('woff2');
+		}
+
+		/* Теперь можно использовать шрифт */
+		body {
+			/* font-family: 'Ee-bellflower', 'Arial', sans-serif; */
+			/* font-family: ; */
+		}
 		body {
 			margin: 0;
 			padding: 0;
 		}
 
-		.container {
-			max-width: 700px;
-			margin: 0 auto;
+		.control-panel {
+			flex-basis: 100%;
+			max-width: 30%;
 		}
 
-		img {
+		.container {
+			display: flex;
+			column-gap: 30px;
+		}
+
+		.certificate {
+			font-family: 'Ee-bellflower';
 			width: 100%;
-			max-width: 700px;
+			max-width: 60%;
+		}
+
+		.certificate__image {
+			max-width: 100%;
 		}
 	</style>
 	<body>
 		<div class="container">
-			<button id="button">Посмотреть сертификат</button>
-
-			<form class="form" action="">
-				<p class="form__field">
-					<label class="form__label">Введите имя</label>
-					<input id="input" type="text" class="form__input" />
-				</p>
-				<p class="form__field">
-					<label class="form__label">Выберите услугу</label>
-					<select name="" id="selectService">
-						<option value="a">Все виды услуг</option>
-						<option value="b">Мотоцикл</option>
-						<option value="с">Квадроцикл</option>
+			<form class="control-panel">
+				<div class="mb-3">
+					<label for="exampleFormControlInput1" class="form-label">
+						Введите имя
+					</label>
+					<input
+						name="name"
+						type="text"
+						class="form-control"
+						id="userName"
+						placeholder="Александр" />
+				</div>
+				<div class="mb-3">
+					<label for="exampleFormControlInput1" class="form-label">
+						Выберите услугу
+					</label>
+					<select
+						name="service"
+						id="service"
+						class="form-select"
+						aria-label="Default select example">
+						<option value="На все услуги клуба" selected>
+							На все услуги клуба
+						</option>
+						<option value="Мотоцикл">Мотоцикл</option>
+						<option value="Квадроцикл">Квадроцикл</option>
+						<option value="Автомобиль">Автомобиль</option>
 					</select>
-				</p>
-				<p class="form__field">
-					<label class="form__label">Выберите цену</label>
-					<select name="" id="priceService">
-						<option value="a">1000 руб</option>
-						<option value="b">2000 руб</option>
-						<option value="с">5000 руб</option>
+				</div>
+				<div class="mb-3">
+					<label for="exampleFormControlInput1" class="form-label">
+						Выберите номинал
+					</label>
+					<select
+						name="coast"
+						id="coast"
+						class="form-select"
+						aria-label="Default select example">
+						<option value="3000 RUB" selected>3000 RUB</option>
+						<option value="4000 RUB">4000 RUB</option>
+						<option value="5000 RUB">5000 RUB</option>
+						<option value="6000 RUB">6000 RUB</option>
 					</select>
-				</p>
-				<p class="form__field">
-					<label class="form__label">Пожелание</label>
-					<input id="wishes" type="text" class="form__input" />
-				</p>
+				</div>
+				<div class="mb-3">
+					<label for="exampleFormControlInput1" class="form-label">
+						Введите пожелание
+					</label>
+					<textarea
+						name="wishes"
+						class="form-control"
+						id="wishes"></textarea>
+				</div>
+				<input type="hidden" name="expired" value="03.25.2023" />
 			</form>
 			<div class="certificate">
-				<img src="" alt="" />
-				<div class="certificate__container">
-					<img id="certificateImage" class="certificate__image" />
-				</div>
-				<canvas style="display: none" id="myCanvas"></canvas>
+				<!-- <img
+					src="./certificate.png"
+					alt=""
+					class="certificate__image" /> -->
+				<canvas class="certificate__image"></canvas>
 			</div>
 		</div>
+		<!-- <canvas id="testCanvas"></canvas> -->
 	</body>
 
 	<script>
-		function randomInteger(min, max) {
-			// получить случайное число от (min-0.5) до (max+0.5)
-			let rand = min - 0.5 + Math.random() * (max - min + 1);
-			return Math.round(rand);
+		class CanvasHelper {
+			parameters = {
+				name: {
+					x: 400,
+					y: 280,
+				},
+				service: {
+					x: 550,
+					y: 350,
+				},
+				coast: {
+					x: 700,
+					y: 420,
+				},
+
+				wishes: {
+					x: 500,
+					y: 490,
+				},
+				expired: {
+					x: 800,
+					y: 620,
+				},
+			};
+
+			_writeTextFromValues() {
+				const formValues = this.getValuesFromForm();
+
+				console.log(formValues);
+
+				formValues.forEach(({ name, value }) => {
+					if (!value) return;
+					const { x, y } = this.parameters[name];
+
+					this.ctx.fillText(value, x, y);
+				});
+			}
+
+			async _commonHandlerAsync() {
+				await this._setCanvasImageAsync();
+				this._writeTextFromValues();
+			}
+
+			constructor(canvasId) {
+				this.canvas = document.querySelector(canvasId);
+				this.ctx = this.canvas.getContext('2d');
+
+				this.#init();
+			}
+
+			getValuesFromForm() {
+				return $('form').serializeArray();
+			}
+
+			async _getImageAsync() {
+				return new Promise((res) => {
+					if (this.image) return res(this.image);
+
+					const image = new Image();
+					image.onload = ({ target }) => {
+						this.image = image;
+						res(image);
+					};
+					image.src = './certificate.png';
+				});
+			}
+
+			_generateGrid(step = 100) {
+				// Задаем шаг сетки (в пикселях)
+
+				// Рисуем вертикальные линии
+				for (let x = 0; x < this.canvas.width; x += step) {
+					this.ctx.beginPath();
+					this.ctx.moveTo(x, 0);
+					this.ctx.lineTo(x, this.canvas.height);
+					this.ctx.strokeStyle = 'gray'; // Например, серый цвет
+					this.ctx.stroke();
+				}
+
+				// Рисуем горизонтальные линии
+				for (let y = 0; y < this.canvas.height; y += step) {
+					this.ctx.beginPath();
+					this.ctx.moveTo(0, y);
+					this.ctx.lineTo(this.canvas.width, y);
+					this.ctx.strokeStyle = 'gray'; // Например, серый цвет
+					this.ctx.stroke();
+				}
+			}
+
+			_setFont({ size = 30, color = 'white' } = {}) {
+				this.ctx.font = `${size}px 'Ee-bellflower', 'Arial', sans-serif`;
+				this.ctx.fillStyle = color;
+				this.ctx.textBaseline = 'top';
+			}
+
+			async _setCanvasImageAsync() {
+				const image = await this._getImageAsync();
+				this.ctx.drawImage(image, 0, 0);
+			}
+
+			async _setCanvasDimensionsAsync() {
+				const image = await this._getImageAsync();
+
+				this.canvas.width = image.width;
+				this.canvas.height = image.height;
+			}
+
+			async #init() {
+				await this._setCanvasDimensionsAsync();
+				await this._setCanvasImageAsync();
+				await this._setFont({ size: 60 });
+
+				// this._generateGrid();
+
+				this._writeTextFromValues();
+
+				// this.ctx.fillText('Misha', 800, 620);
+
+				$('#userName').on('input', this._commonHandlerAsync.bind(this));
+				$('#coast').on('change', this._commonHandlerAsync.bind(this));
+				$('#service').on('change', this._commonHandlerAsync.bind(this));
+				$('#wishes').on('input', this._commonHandlerAsync.bind(this));
+			}
 		}
 
-		var userName = '';
-		var serviceName = '';
-		var price = '';
-		var wishesText = '';
-
-		var number = randomInteger(10000, 99999);
-
-		let loadImageOnCanvasAndThenWriteText = (canvas, imageUrl) => {
-			// Get the 2D Context from the canvas
-			let ctx = canvas.getContext('2d');
-
-			// Create a new Image
-			let img = new Image();
-
-			// Setting up a function with the code to run after the image is loaded
-			img.onload = () => {
-				// Once the image is loaded, we will get the width & height of the image
-				let loadedImageWidth = img.width;
-				let loadedImageHeight = img.height;
-
-				// Set the canvas to the same size as the image.
-				canvas.width = loadedImageWidth;
-				canvas.height = loadedImageHeight;
-
-				// Draw the image on to the canvas.
-				ctx.drawImage(img, 0, 0);
-
-				// Set all the properties of the text based on the input params
-				ctx.font = 'bold 170px monotype corsiva';
-
-				ctx.fillStyle = 'blue';
-
-				// Setting this so that the postion of the text can be set
-				// based on the x and y cord from the top right corner
-				ctx.textBaseline = 'top';
-			};
-
-			// Now that we have set up the image "onload" handeler, we can assign
-			// an image URL to the image.
-			img.src = imageUrl;
-
-			button.onclick = () => {
-				ctx.drawImage(img, 0, 0);
-				ctx.fillText(serviceName, 1640, 1120); // Service name
-				ctx.fillText(input.value, 1240, 890); // User name
-				ctx.fillText(price, 2240, 1340); // price name
-				ctx.fillText(wishesText, 1560, 1560); // wishes
-				ctx.fillText(number, 40, 130); // random number
-
-				certificateImage.src = canvas.toDataURL('image/jpg');
-			};
-
-			input.addEventListener('input', function (e) {
-				userName = e.target.value;
-			});
-			wishes.addEventListener('input', function (e) {
-				wishesText = e.target.value;
-			});
-
-			selectService.addEventListener('change', function (e) {
-				var value = e.currentTarget.value;
-				var text =
-					e.currentTarget.options[e.currentTarget.selectedIndex].text;
-
-				serviceName = text;
-			});
-
-			priceService.addEventListener('change', function (e) {
-				var value = e.currentTarget.value;
-				var text =
-					e.currentTarget.options[e.currentTarget.selectedIndex].text;
-
-				price = text;
-			});
-
-			price = priceService.options[priceService.selectedIndex].text;
-			serviceName =
-				selectService.options[selectService.selectedIndex].text;
+		const init = () => {
+			new CanvasHelper('.certificate__image');
 		};
 
-		// Run code after the page is loaded
-		document.addEventListener('DOMContentLoaded', () => {
-			// Setting up the canvas
-			let theCanvas = document.getElementById('myCanvas');
-
-			// Some image URL..
-			let imageUrl = './образц.jpg';
-
-			// Load image on the canvas & then write text
-			loadImageOnCanvasAndThenWriteText(theCanvas, imageUrl);
-		});
+		$(init);
 	</script>
 </html>
